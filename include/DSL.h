@@ -15,6 +15,7 @@
 #define NVF node->val->func
 #define NVO node->val->op
 #define NVV node->val->var
+#define NVKW node->val->key_word
 #define ND node->data_type
 
 #endif

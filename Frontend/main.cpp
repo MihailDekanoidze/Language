@@ -8,7 +8,7 @@ int main(int argc, char** argv)
 {
     Errors error  = NO_ERROR;
 
-    if (!argc)  error = NO_DEFINED_FILE;
+    if (!(argc -1))  error = NO_DEFINED_FILE;
     ERROR_CHECK(error, ,  ("Files was not defined: error code "));
 
     Program_Code* input_code = Code_Struct_Ctor();
@@ -18,6 +18,7 @@ int main(int argc, char** argv)
     ERROR_CHECK(error, , ("Can not process the input file: error code "));
 
     text_info* token_array = expression_tokenize(input_code->code);
+    token_array_print((Token*)token_array->buffer);
 
     Tree* program_tree = tree_create();
     program_tree->root = get_G((Token*)(token_array->buffer));

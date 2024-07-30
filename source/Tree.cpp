@@ -5,7 +5,7 @@
 
 #include "../include/Tree.h"
 #include "../include/Stack.h"
-#include "../include/others.h"
+#include "../include/ExtraFunctions.h"
 #include "../include/Read.h"
 
 Tree* tree_create(void)
@@ -66,6 +66,7 @@ void node_print(const Node* N, FILE* tree_data)
             printf("Empty node\n");
         case func:
         case operation:
+        case key_word:
         default:
             break;
         }
@@ -77,6 +78,9 @@ void node_print(const Node* N, FILE* tree_data)
 
         switch (ND)
         {
+        case key_word:
+            fprintf(tree_data, "%s", get_key_word_str(NVKW));
+            break;
         case operation:
             fprintf(tree_data, "%c", get_oper_symbol(NVO));
             break;
@@ -112,6 +116,9 @@ void print_curr_node(const Node* N)
     case func:
         fprint_func(stdout, NVF);
         break;
+    case key_word:
+        printf(" %s ", get_key_word_str(NVKW));
+        break;
     case empty_node:
         printf("Empty token\n");
         break;
@@ -122,11 +129,11 @@ void print_curr_node(const Node* N)
 }
 
 
-void skip_spaces(char* source, size_t* pos)
+void skip_spaces(char** source)
 {
-    while (isspace(*(source + *pos)))
+    while (isspace(**(source)) || (**(source) == '\n'))
     {
-        (*pos)++;
+        (*source)++;
     }
 }
 
@@ -242,7 +249,7 @@ void node_dtor_one(Node* N, Child saved_child)
     return;
 }
 
-Operation get_oper_code(char* source)
+Operation get_oper_code(const char* source)
 {
     for (size_t i = 0; i < OPERATION_COUNT; i++)
         if (*source == op_info[i].symbol) return op_info[i].op;
@@ -250,7 +257,7 @@ Operation get_oper_code(char* source)
     //printf("Expected unknown oper\n");
     return null_op;
 }
-Function get_funct_code(char* source)
+Function get_funct_code(const char* source)
 {
     for (size_t i = 0; i < FUNCTION_COUNT; i++)
     {
@@ -270,6 +277,36 @@ char get_oper_symbol(Operation op)
     return 0;
 }
 
+const char* get_key_word_str(Key_word curr_word)
+{
+    for (size_t i = 0; i < KEY_WORD_COUNT; i++)
+        if (curr_word == key_word_info[i].word) return key_word_info[i].name;
+
+    return 0;
+}
+
+Key_word get_key_word_number(const char* data)
+{
+    for (size_t i = 0; i < KEY_WORD_COUNT; i++)
+    {
+
+        #ifdef DEBUG_ON
+        printf("i = %zu\n", i);
+        printf("Original key_word len is %zu\n", strlen(key_word_info[i].name));
+        printf("Compare keyword between %s and ", key_word_info[i].name);
+        for (size_t j = 0; j < strlen(key_word_info[i].name); j++)
+        {
+            printf("%c", *(data + j));
+        }
+        printf("\n");
+        #endif
+
+        if (!strncmp(data, key_word_info[i].name, strlen(key_word_info[i].name)))
+            return key_word_info[i].word;
+    }
+    return null_w;
+}
+
 void fprint_arg(FILE* dest, const Node* N)
 {
     switch (ND)
@@ -285,6 +322,9 @@ void fprint_arg(FILE* dest, const Node* N)
         break;
     case func:
         fprint_func(dest, NVF);
+        break;
+    case key_word:
+        fprintf(dest, " %s ", get_key_word_str(NVKW));
         break;
     case empty_node:
         fprintf(dest, "Empty node\n");
@@ -347,7 +387,7 @@ const char* get_funct_name(Function funct)
 }
 
 
-Errors graph_image(Node* start, const char* name)
+Errors graph_image(const Node* start, const char* name)
 {
     FILE* tree_info = fopen(name, "w");
 
@@ -373,7 +413,7 @@ Errors graph_image(Node* start, const char* name)
     return NO_ERROR;
 }
 
-void node_dot_create(Node* N, FILE* tree_info)
+void node_dot_create(const Node* N, FILE* tree_info)
 {
     if (!N) return;
     
@@ -398,3 +438,94 @@ void node_dot_create(Node* N, FILE* tree_info)
 
     return;
 }
+
+node_data* val_double(double data)         
+{              
+    union node_data* val = (node_data*)calloc(1, sizeof(node_data));    
+    val->number = data;   
+    return val;                                                         
+}
+
+node_data* val_Key_word(Key_word key_word)
+{
+    union node_data* val = (node_data*)calloc(1, sizeof(node_data));
+    val->key_word = key_word;
+    return val;
+}
+
+node_data* val_Operation(Operation op)         
+{              
+    union node_data* val = (node_data*)calloc(1, sizeof(node_data));    
+    val->op = op;
+    return val;                                                         
+}
+
+node_data* val_Function(Function func)         
+{              
+    union node_data* val = (node_data*)calloc(1, sizeof(node_data));    
+    val->func = func;
+    return val;                                                         
+}
+
+node_data* val_var(const char* var)         
+{              
+    if (!var) 
+    {
+        printf("var is null\n");
+        return NULL;
+    }
+
+    union node_data* val = (node_data*)calloc(1, sizeof(node_data)); 
+    val->var = (char*)calloc(strlen(var) + 1, sizeof(char));   
+    memcpy(val->var, var, strlen(var) + 1);
+
+    if(!val) 
+    {
+        printf("in val_var val is null\n");
+        return NULL;
+    }
+    else if (!(val->var)) 
+    {
+        printf("in val_var val->var is null\n");
+        return NULL;
+    }
+    return val;                                                         
+}
+
+Node* copy_node(const Node* N)
+{
+    if (N == NULL) return NULL;
+
+    Node* copied_node = (Node*)calloc(1, sizeof(Node));
+    copied_node->val = (node_data*)calloc(1, sizeof(node_data));
+
+    memcpy(&copied_node->data_type, &ND, sizeof(Type));
+    if (ND != var) memcpy(copied_node->val, NV, sizeof(node_data));
+    else
+    {
+        size_t len = strlen(NVV) + 1;
+        copied_node->val->var = (char*)calloc(len, sizeof(char));   
+        memcpy(copied_node->val->var, NVV, len);
+    }
+
+    copied_node->left  = copy_node(L);
+    copied_node->right = copy_node(R);
+
+    return copied_node;
+}
+
+Node* create_node(Type data_type, node_data* val, Node* left, Node* right)
+{
+    if (!val) {printf("node_data has null ptr\n");}
+    Node* N = (Node*) calloc(1, sizeof(Node));
+    NV = val;
+    ND = data_type;
+
+    L  = left;
+    R = right;
+
+    return N;   
+}
+
+
+

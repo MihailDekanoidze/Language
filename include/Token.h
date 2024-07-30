@@ -14,11 +14,12 @@
     print_token_arg(token);                 \
     printf(" %s\n", __PRETTY_FUNCTION__);
 #else
-#define CURR_TOKEN_PRINT(token) ;            
+#define CURR_TOKEN_PRINT(token);            
 #endif
 
 
-enum Token_type 
+
+enum Token_type
 {
     t_empty,
     t_open_bracket,
@@ -29,7 +30,7 @@ enum Token_type
     t_func,
     t_op,
     t_end,
-    t_act_end
+    t_key_word
 };
 
 union token_data
@@ -39,6 +40,7 @@ union token_data
     Operation   op;
     double      number;
     Function    func;
+    Key_word    key_word;
 };
 
 
@@ -49,12 +51,12 @@ typedef struct Token
 }   Token;
 
 
-text_info*  expression_tokenize(text_info* expression);
-double      get_number(char* source);
-void        op_search(char* source, Token_type* type);
-char*       get_var(char* source);
-void        token_array_print(Token* token_array);
+text_info*  expression_tokenize(const text_info* expression);
+double      get_number(const char* source);
+void        op_search(const char* source, Token_type* type);
+char*       get_var(const char* source);
+void        token_array_print(const Token* token_array);
 void        print_token_arg(const Token* token);
 void        token_array_dtor(text_info* tokens);
-char*       get_variable(char* source);
+char*       get_variable(const char* source);
 #endif

@@ -9,6 +9,7 @@ Program_Code* Code_Struct_Ctor(void)
 {
     Program_Code* code_struct = (Program_Code*)calloc(1, sizeof(Program_Code));
     text_info* code_info = text_info_ctor();
+    code_struct->code = code_info;
     code_struct->error = NO_ERROR;
 
     return code_struct;
@@ -21,7 +22,7 @@ void Code_Struct_Dtor(Program_Code* code_struct)
     free(code_struct);
 }
 
-Errors File_Read(char* input_file, Program_Code* code_struct)
+Errors File_Read(const char* input_file, Program_Code* code_struct)
 {
     FILE* code_file = FOPEN(input_file, "r");
     if (!code_file) 

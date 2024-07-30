@@ -2,6 +2,7 @@
 #define INPUT_TEXT_H
 
 #include "./CommonIncludes.h"
+#include "stdio.h"
 
 struct text_info {
                     void* buffer;

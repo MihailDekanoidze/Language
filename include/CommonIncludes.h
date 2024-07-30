@@ -43,7 +43,7 @@ if (error)                                      \
 } while(0)
 
 #ifdef DEBUG_ON
-#define FOPEN(file_name, mode) fopen(file_name, mode);                                              \ 
+#define FOPEN(file_name, mode) fopen(file_name, mode);                                              \
         fprintf(stderr, "open: %s on line: %d %s\n", #file_name, __LINE__, __PRETTY_FUNCTION__);
 #else
 #define FOPEN(file_name, mode) fopen(file_name, mode); 
@@ -52,7 +52,7 @@ if (error)                                      \
 #ifdef DEBUG_ON
 #define FCLOSE(file_name) int file_close = fclose(file_name);                                       \
         fprintf(stderr, "close: %s  on line: %d %s\n", #file_name, __LINE__, __PRETTY_FUNCTION__);  \
-        if (file_close != 0) {fprintf(stderr, "meow!!\n");}
+                if (file_close != 0) {fprintf(stderr, "meow!!\n");}
 #else
 #define FCLOSE(file_name) int file_close = fclose(file_name);       
 #endif

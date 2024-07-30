@@ -2,11 +2,11 @@
 #define DIFFERENTIATOR_H
 
 #include <stdio.h>
-#include "./include/CommonIncludes.h"
-#include "./include/Token.h"
-#include "./include/Tree.h"
-#include "./include/DSL.h"
-#include "./include/Colors.h"
+#include "../include/CommonIncludes.h"
+#include "../include/Token.h"
+#include "../include/Tree.h"
+#include "../include/DSL.h"
+#include "../include/Colors.h"
 
 //#define DEBUG_PRINTF
 
@@ -24,6 +24,8 @@
 #define _DIV(left_node, right_node)     create_node(operation, Div,     left_node, right_node)
 #define _POW(left_node, right_node)     create_node(operation, Pow,     left_node, right_node)
 #define _ASSIGN(left_node, right_node)  create_node(operation, Assign,  left_node, right_node)
+
+#define _ACT_END(left_node, right_node) create_node(key_word, Act_End,  left_node, right_node) 
 
 #define _SIN(right_node) create_node(func, Sin, NULL, right_node)
 #define _COS(right_node) create_node(func, Cos, NULL, right_node)
@@ -72,8 +74,6 @@ size_t      nsymbol_in_str      (char* source, char symbol);
 Token*      create_token        (Token_type data_type, node_data* val);
 
 Node*       diff_the_tree       (const Node* node);
-Node*       create_node         (Type, node_data*, Node*, Node*);
-Node*       copy_node           (const Node* N);
 
 int         nan_search           (Node* curr_node);
 int         const_calculation    (Node* node, size_t* changes);
@@ -87,7 +87,9 @@ size_t      factorial(size_t num);
 
 Errors      Taylor_decomposition(const char* file_name, Tree* tree);
 
-void        syntax_error(void);
+void        parser_syntax_error(void);
+Node*       get_A(Token** token);
+Node*       get_ASSIGN(Token** token);
 Node*       get_G(Token* token_array);
 Node*       get_N(Token** token);
 Node*       get_E(Token** token);
@@ -107,13 +109,8 @@ double     calc_get_C(void);
 double     calc_get_F(void);
 double     calc_get_D(void);
 
-node_data* val_double           (double);
-node_data* val_Operation        (Operation);
-node_data* val_var              (char*); 
-node_data* val_Function         (Function);
 
 //int        Calculation(void);
-void       parser_syntax_error(void);
 
 
 #define Null    val_Operation(null_op)    // in main filling or use constructor
@@ -133,5 +130,7 @@ void       parser_syntax_error(void);
 #define Cth     val_Function(cth_f)     
 #define Ln      val_Function(ln_f)
 #define Exp     val_Function(exp_f)
+#define Act_End val_Key_word(act_end)
+
 
 #endif

@@ -43,13 +43,18 @@ Node* get_A(Token** token)
 {
     CURR_TOKEN_PRINT(*token);
 
-    Node* node = get_ASSIGN(token);
+    Node* node1 = get_ASSIGN(token);
 
     CURR_TOKEN_PRINT(*token);
 
-    if ((*token)->token_type == t_act_end) {token++;}
-    else {REQUIRE(';', *token);}
-    return node;
+    while ((*token)->token_type == t_key_word && (*token)->val->key_word == act_end)
+    {
+        (*token)++;
+        Node* node2 = get_ASSIGN(token);
+
+        node1  = _ACT_END(node1, node2);
+    }
+    return node1;
 }
 
 Node* get_ASSIGN(Token** token)
@@ -61,7 +66,7 @@ Node* get_ASSIGN(Token** token)
 
     CURR_TOKEN_PRINT(*token);
 
-    if ((*token)->token_type == t_op && (*token)->val->op == '=') 
+    if ((*token)->token_type == t_op && (*token)->val->op == assign_op) 
     {
         (*token)++;
         
